@@ -1,0 +1,105 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 20,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "ice_sprite",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "body",
+					"parent": "ice_sprite",
+					"pivot": [0, 18.5, 0]
+				},
+				{
+					"name": "core",
+					"parent": "body",
+					"pivot": [0, 18.5, 0],
+					"cubes": [
+						{"origin": [1, 19.5, 1], "size": [-2, -2, -2], "inflate": -0.25, "uv": [0, 0]},
+						{"origin": [-1, 17.5, -1], "size": [2, 2, 2], "uv": [34, 35]}
+					]
+				},
+				{
+					"name": "bottom_shard",
+					"parent": "body",
+					"pivot": [0, 6.5, 0],
+					"cubes": [
+						{"origin": [-2.5, -1, 0], "size": [5, 15, 0], "inflate": 0.01, "uv": [10, 16]},
+						{"origin": [0, -1, -2.5], "size": [0, 15, 5], "inflate": 0.01, "uv": [0, 11]},
+						{"origin": [-1.5, 3, -1.5], "size": [3, 7, 3], "uv": [20, 20]}
+					]
+				},
+				{
+					"name": "bottom_left_shard",
+					"parent": "body",
+					"pivot": [5, 13.5, 0],
+					"rotation": [0, 0, -30],
+					"cubes": [
+						{"origin": [3.5, 10, 0], "size": [3, 7, 0], "inflate": 0.01, "uv": [12, 36]},
+						{"origin": [5, 10, -1.5], "size": [0, 7, 3], "inflate": 0.01, "uv": [20, 32]}
+					]
+				},
+				{
+					"name": "bottom_right_shard",
+					"parent": "body",
+					"pivot": [-5, 13.5, 0],
+					"rotation": [0, 0, 30],
+					"cubes": [
+						{"origin": [-6.5, 10, 0], "size": [3, 7, 0], "inflate": 0.01, "uv": [0, 36]},
+						{"origin": [-5, 10, -1.5], "size": [0, 7, 3], "inflate": 0.01, "uv": [30, 27]}
+					]
+				},
+				{
+					"name": "top_left_shard",
+					"parent": "body",
+					"pivot": [3.5, 24.5, 0],
+					"rotation": [0, 0, 30],
+					"cubes": [
+						{"origin": [2, 21, 0], "size": [3, 7, 0], "inflate": 0.01, "uv": [36, 10]},
+						{"origin": [3.5, 21, -1.5], "size": [0, 7, 3], "inflate": 0.01, "uv": [32, 20]}
+					]
+				},
+				{
+					"name": "top_right_shard",
+					"parent": "body",
+					"pivot": [-3.5, 24.5, 0],
+					"rotation": [0, 0, -30],
+					"cubes": [
+						{"origin": [-5, 21, 0], "size": [3, 7, 0], "inflate": 0.01, "uv": [6, 36]},
+						{"origin": [-3.5, 21, -1.5], "size": [0, 7, 3], "inflate": 0.01, "uv": [31, 0]}
+					]
+				},
+				{
+					"name": "left_shard",
+					"parent": "body",
+					"pivot": [6.5, 19.5, 0],
+					"rotation": [0, 0, -10],
+					"cubes": [
+						{"origin": [4, 18, 0], "size": [5, 3, 0], "inflate": 0.01, "uv": [31, 0]},
+						{"origin": [4, 19.5, -1.5], "size": [5, 0, 3], "inflate": 0.01, "uv": [26, 20]}
+					]
+				},
+				{
+					"name": "right_shard",
+					"parent": "body",
+					"pivot": [-6.5, 19.5, 0],
+					"rotation": [0, 0, 10],
+					"cubes": [
+						{"origin": [-9, 18, 0], "size": [5, 3, 0], "inflate": 0.01, "uv": [0, 0]},
+						{"origin": [-9, 19.5, -1.5], "size": [5, 0, 3], "inflate": 0.01, "uv": [18, 0]}
+					]
+				}
+			]
+		}
+	]
+}
