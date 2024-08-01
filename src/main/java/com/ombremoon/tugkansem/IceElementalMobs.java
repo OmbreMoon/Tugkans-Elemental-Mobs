@@ -1,7 +1,6 @@
 package com.ombremoon.tugkansem;
 
 import com.ombremoon.tugkansem.common.init.MobInit;
-import com.ombremoon.tugkansem.network.ModNetworking;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -22,7 +21,6 @@ public class IceElementalMobs {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        ModNetworking.registerPackets();
     }
 
     @SubscribeEvent

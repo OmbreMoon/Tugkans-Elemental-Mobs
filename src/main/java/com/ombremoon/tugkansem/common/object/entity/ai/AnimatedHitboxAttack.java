@@ -1,6 +1,8 @@
 package com.ombremoon.tugkansem.common.object.entity.ai;
 
 import com.mojang.datafixers.util.Pair;
+import com.ombremoon.sentinellib.api.box.SentinelBox;
+import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.tugkansem.common.object.entity.mob.IceElementalMob;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.server.level.ServerLevel;
@@ -23,16 +25,22 @@ import java.util.function.Function;
 public class AnimatedHitboxAttack<E extends Mob> extends DelayedBehaviour<E> {
     private static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = ObjectArrayList.of(Pair.of(MemoryModuleType.ATTACK_TARGET, MemoryStatus.VALUE_PRESENT), Pair.of(MemoryModuleType.ATTACK_COOLING_DOWN, MemoryStatus.VALUE_ABSENT));
     private final IceElementalMob.TriggerableAnim anim;
-
-    protected Function<E, Integer> attackIntervalSupplier = entity -> 20;
+    private final SentinelBox sentinelBox;
+    protected Function<E, Integer> attackIntervalSupplier = entity -> 40;
     protected Pair<Integer, Integer> attackRange = Pair.of(0, 1);
     protected List<SoundEvent> attackSounds = new ArrayList<>();
     @Nullable
     protected LivingEntity target = null;
+    protected boolean shouldStopHitbox;
 
     public AnimatedHitboxAttack(int delayTicks, IceElementalMob.TriggerableAnim anim) {
+        this(delayTicks, anim, null);
+    }
+
+    public AnimatedHitboxAttack(int delayTicks, IceElementalMob.TriggerableAnim anim, @Nullable SentinelBox sentinelBox) {
         super(delayTicks);
         this.anim = anim;
+        this.sentinelBox = sentinelBox;
     }
 
     public AnimatedHitboxAttack<E> attackInterval(Function<E, Integer> supplier) {
@@ -56,6 +64,12 @@ public class AnimatedHitboxAttack<E extends Mob> extends DelayedBehaviour<E> {
 
     public AnimatedHitboxAttack<E> attackRange(int range) {
         return attackRange(0, range);
+    }
+
+    public AnimatedHitboxAttack<E> keepHitbox() {
+        this.shouldStopHitbox = false;
+
+        return this;
     }
 
     @Override
@@ -82,13 +96,15 @@ public class AnimatedHitboxAttack<E extends Mob> extends DelayedBehaviour<E> {
     protected void start(E entity) {
         BehaviorUtils.lookAtEntity(entity, this.target);
         ((GeoEntity)entity).triggerAnim(anim.controllerName(), anim.animName());
-        //init hitbox
+        if (this.sentinelBox != null)
+            ((ISentinel)entity).triggerSentinelBox(this.sentinelBox);
     }
 
     @Override
     protected void stop(E entity) {
         this.target = null;
-        //disable hitbox
+        if (this.sentinelBox != null && this.shouldStopHitbox)
+            ((ISentinel)entity).removeSentinelInstance(this.sentinelBox);
     }
 
     @Override
@@ -104,6 +120,5 @@ public class AnimatedHitboxAttack<E extends Mob> extends DelayedBehaviour<E> {
         for (SoundEvent soundEvent : this.attackSounds) {
             entity.level().playSound((Player) null, entity.getX(), entity.getY(), entity.getZ(), soundEvent, entity.getSoundSource(), 1.0F, 1.0F + (entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.2F);
         }
-        //activate hitbox
     }
 }

@@ -1,6 +1,8 @@
 package com.ombremoon.tugkansem.common.object.entity.mob;
 
+import com.ombremoon.sentinellib.api.box.SentinelBox;
 import com.ombremoon.tugkansem.common.object.entity.projectile.IceSpriteProjectile;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
@@ -23,6 +25,8 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
+
+import java.util.List;
 
 public class IceSprite extends IceElementalMob implements RangedAttackMob {
 
@@ -104,5 +108,10 @@ public class IceSprite extends IceElementalMob implements RangedAttackMob {
                 .add(Attributes.MAX_HEALTH, 5.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.FOLLOW_RANGE, 20.0);
+    }
+
+    @Override
+    public List<SentinelBox> getSentinelBoxes() {
+        return ObjectArrayList.of();
     }
 }

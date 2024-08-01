@@ -1,5 +1,7 @@
 package com.ombremoon.tugkansem.common.object.entity.mob;
 
+import com.ombremoon.sentinellib.common.BoxInstanceManager;
+import com.ombremoon.sentinellib.common.ISentinel;
 import com.ombremoon.tugkansem.common.object.entity.GeoIceEntity;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -33,6 +35,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTar
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
+import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor;
 import net.tslat.smartbrainlib.example.SBLSkeleton;
 import net.tslat.smartbrainlib.util.BrainUtils;
@@ -44,13 +47,16 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.function.Predicate;
 
-public abstract class IceElementalMob extends Monster implements GeoIceEntity, SmartBrainOwner<IceElementalMob> {
+public abstract class IceElementalMob extends Monster implements GeoIceEntity, SmartBrainOwner<IceElementalMob>, ISentinel {
     protected static final EntityDataAccessor<Boolean> TURN_LOCKED = SynchedEntityData.defineId(IceElementalMob.class, EntityDataSerializers.BOOLEAN);
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
     protected static final RawAnimation DEATH = RawAnimation.begin().thenLoop("death");
+    protected static final Predicate<LivingEntity> ICE_ELEMENTAL_PREDICATE = livingEntity ->  !(livingEntity instanceof IceElementalMob);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final BoxInstanceManager manager = new BoxInstanceManager(this);
 
     public IceElementalMob(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -64,6 +70,12 @@ public abstract class IceElementalMob extends Monster implements GeoIceEntity, S
     @Override
     protected void customServerAiStep() {
         tickBrain(this);
+    }
+
+    @Override
+    public void aiStep() {
+        super.aiStep();
+        tickBoxes();
     }
 
     @Override
@@ -166,16 +178,21 @@ public abstract class IceElementalMob extends Monster implements GeoIceEntity, S
         return super.isInvulnerableTo(pSource);
     }
 
-    public static void lockMovement(Mob mob) {
-        mob.getNavigation().stop();
-        BrainUtils.clearMemory(mob, MemoryModuleType.LOOK_TARGET);
-        BrainUtils.clearMemory(mob, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER);
-        BrainUtils.clearMemory(mob, MemoryModuleType.ATTACK_TARGET);
+    public void lockMovement() {
+        this.getNavigation().stop();
+        BrainUtils.clearMemory(this, MemoryModuleType.LOOK_TARGET);
+        BrainUtils.clearMemory(this, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER);
+        BrainUtils.clearMemory(this, MemoryModuleType.ATTACK_TARGET);
     }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    @Override
+    public BoxInstanceManager getBoxManager() {
+        return this.manager;
     }
 
     public String getHeadBone() {

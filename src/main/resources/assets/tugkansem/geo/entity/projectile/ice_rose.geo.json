@@ -1,0 +1,57 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 16,
+				"texture_height": 16,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "icy_rose",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "vfx",
+					"parent": "icy_rose",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "icy_rose_toss",
+					"parent": "vfx",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "icy_rose_rot",
+					"parent": "icy_rose_toss",
+					"pivot": [0, 27, -20],
+					"rotation": [0, 0, 90]
+				},
+				{
+					"name": "icy_rose_shot",
+					"parent": "icy_rose_rot",
+					"pivot": [0, 27, -17]
+				},
+				{
+					"name": "rosy",
+					"parent": "icy_rose_shot",
+					"pivot": [0, 27, -22],
+					"rotation": [90, 0, 0],
+					"cubes": [
+						{"origin": [0.015, 22, -22.5], "size": [0.01, 7, 1], "inflate": 0.01, "uv": [6, 6]},
+						{"origin": [-1.5, 29, -23.5], "size": [3, 3, 3], "uv": [0, 0]},
+						{"origin": [-0.01, 26, -25.5], "size": [0.01, 2, 3], "inflate": 0.01, "pivot": [-0.001, 26, -22.5], "rotation": [-22.5, 0, 0], "uv": [9, 5]},
+						{"origin": [-0.01, 24, -21.5], "size": [0.01, 2, 2], "inflate": 0.01, "pivot": [-0.001, 25, -21.5], "rotation": [45, 0, 0], "uv": [1, 6]},
+						{"origin": [-0.01, 24, -23.5], "size": [0.01, 1, 1], "inflate": 0.01, "pivot": [-0.001, 25, -22.5], "rotation": [45, 0, 0], "uv": [13, 1]},
+						{"origin": [-0.01, 27.5, -22.5], "size": [0.01, 1, 1], "inflate": 0.01, "pivot": [-0.001, 28.5, -21.5], "rotation": [45, 0, 0], "uv": [13, -1]},
+						{"origin": [-0.035, 22, -22.5], "size": [0.01, 7, 1], "inflate": 0.01, "uv": [6, 6]}
+					]
+				}
+			]
+		}
+	]
+}

@@ -3,9 +3,7 @@ package com.ombremoon.tugkansem.common.object.entity.projectile;
 import com.ombremoon.tugkansem.common.init.ParticleInit;
 import com.ombremoon.tugkansem.common.init.ProjectileInit;
 import com.ombremoon.tugkansem.common.object.entity.mob.IceElementalMob;
-import com.ombremoon.tugkansem.common.object.entity.mob.IceSprite;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import com.ombremoon.tugkansem.common.object.entity.mob.IceQueen;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,16 +15,15 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class IceSpriteProjectile extends IceElementalProjectile {
-
-    public IceSpriteProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
+public class IceQueenProjectile extends IceElementalProjectile {
+    public IceQueenProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
-    public IceSpriteProjectile(Level pLevel, IceSprite sprite) {
-        super(ProjectileInit.ICE_SPRITE_BULLET.get(), pLevel);
-        this.setOwner(sprite);
-        this.setPos(sprite.getX() - (double)(sprite.getBbWidth() + 1.0F) * 0.5D * (double) Mth.sin(sprite.yBodyRot * ((float)Math.PI / 180F)), sprite.getEyeY() - (double)0.8F, sprite.getZ() + (double)(sprite.getBbWidth() + 1.0F) * 0.5D * (double)Mth.cos(sprite.yBodyRot * ((float)Math.PI / 180F)));
+    public IceQueenProjectile(Level pLevel, IceQueen queen) {
+        super(ProjectileInit.ICE_QUEEN_BULLET.get(), pLevel);
+        this.setOwner(queen);
+        this.setPos(queen.getX() - (double)(queen.getBbWidth() + 1.0F) * 0.5 * (double) Mth.sin(queen.yBodyRot * ((float)Math.PI / 180F)), queen.getEyeY() - 0.8, queen.getZ() + (double)(queen.getBbWidth() + 1.0F) * 0.5 * (double)Mth.cos(queen.yBodyRot * ((float)Math.PI / 180F)));
     }
 
     @Override
@@ -46,12 +43,6 @@ public class IceSpriteProjectile extends IceElementalProjectile {
             this.setPos(d0, d1, d2);
         }
 
-        if (this.level().isClientSide) {
-            if (this.tickCount % 3 == 0 || this.tickCount == 1) {
-                this.level().addParticle(ParticleInit.ICE_SPRITE_BULLET_TRAIL.get(), this.getX(), this.getY() - 0.5F, this.getZ(), 0, 0, 0);
-            }
-        }
-
         if (this.tickCount >= 30) {
             this.discard();
         }
@@ -61,7 +52,7 @@ public class IceSpriteProjectile extends IceElementalProjectile {
     protected void onHitEntity(EntityHitResult pResult) {
         super.onHitEntity(pResult);
         if (!(pResult.getEntity() instanceof IceElementalMob)) {
-            pResult.getEntity().hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), 10);
+            pResult.getEntity().hurt(this.damageSources().mobProjectile(this, (LivingEntity)this.getOwner()), 10.0F);
             this.discard();
         }
     }

@@ -1,11 +1,16 @@
 package com.ombremoon.tugkansem.common.object.entity.mob;
 
 import com.mojang.datafixers.util.Pair;
-import com.ombremoon.tugkansem.common.init.MemoryTypeInit;
+import com.ombremoon.sentinellib.api.box.AABBSentinelBox;
+import com.ombremoon.sentinellib.api.box.OBBSentinelBox;
+import com.ombremoon.sentinellib.api.box.SentinelBox;
 import com.ombremoon.tugkansem.common.init.MobInit;
 import com.ombremoon.tugkansem.common.object.entity.IceMist;
 import com.ombremoon.tugkansem.common.object.entity.IceWall;
+import com.ombremoon.tugkansem.common.object.entity.ai.AnimatedHitboxAttack;
 import com.ombremoon.tugkansem.common.object.entity.ai.HeldAnimatedHitboxAttack;
+import com.ombremoon.tugkansem.common.object.entity.projectile.IceQueenProjectile;
+import com.ombremoon.tugkansem.common.object.entity.projectile.RoseProjectile;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -14,6 +19,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -21,20 +27,16 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
-import net.minecraft.world.entity.monster.Evoker;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
-import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableRangedAttack;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.CustomBehaviour;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.CustomDelayedBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.CustomHeldBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.StayWithinDistanceOfAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
@@ -53,10 +55,45 @@ import java.util.List;
 public class IceQueen extends IceElementalMob implements RangedAttackMob {
     protected static final EntityDataAccessor<Boolean> ENCASED = SynchedEntityData.defineId(IceQueen.class, EntityDataSerializers.BOOLEAN);
     private static final TriggerableAnim BASIC = new TriggerableAnim("RangedBasic", "basic");
+    private static final TriggerableAnim ROSE = new TriggerableAnim("RangedSpecial", "rose_toss");
     private static final TriggerableAnim BEAM = new TriggerableAnim("RangedBeam", "ice_beam");
     private static final TriggerableAnim SHARDS = new TriggerableAnim("MeleeAoE", "shards");
     private static final TriggerableAnim MIST = new TriggerableAnim("MeleeLargeAoE", "mist");
     private static final TriggerableAnim WALLS = new TriggerableAnim("RangedAoE", "wall_summon");
+
+    private static final AABBSentinelBox SHARD = AABBSentinelBox.Builder.of("shard")
+            .sizeAndOffset(1.0F, 1.0F, 0.0F, 1.0F, 0.0F)
+            .activeTicks((entity, integer) -> integer == 27)
+            .attackCondition(ICE_ELEMENTAL_PREDICATE)
+            .typeDamage(DamageTypes.FREEZE, 15.0F).build();
+
+    private static final OBBSentinelBox BEAM_1 = OBBSentinelBox.Builder.of("beam_1")
+            .sizeAndOffset(0.3F, 0.3F, 2.0F, 0.0F, 1.7F, 3.0F)
+            .boxDuration(100)
+            .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
+            .attackCondition(ICE_ELEMENTAL_PREDICATE)
+            .typeDamage(DamageTypes.FREEZE, 5.0F).build();
+
+    private static final OBBSentinelBox BEAM_2 = OBBSentinelBox.Builder.of("beam_2")
+            .sizeAndOffset(0.3F, 0.3F, 2.0F, 0.0F, 1.7F, 7.0F)
+            .boxDuration(100)
+            .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
+            .attackCondition(ICE_ELEMENTAL_PREDICATE)
+            .typeDamage(DamageTypes.FREEZE, 5.0F).build();
+
+    private static final OBBSentinelBox BEAM_3 = OBBSentinelBox.Builder.of("beam_3")
+            .sizeAndOffset(0.3F, 0.3F, 2.0F, 0.0F, 1.7F, 11.0F)
+            .boxDuration(100)
+            .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
+            .attackCondition(ICE_ELEMENTAL_PREDICATE)
+            .typeDamage(DamageTypes.FREEZE, 5.0F).build();
+
+    private static final OBBSentinelBox BEAM_4 = OBBSentinelBox.Builder.of("beam_4")
+            .sizeAndOffset(0.3F, 0.3F, 2.0F, 0.0F, 1.7F, 15.0F)
+            .boxDuration(100)
+            .activeTicks((entity, integer) -> integer > 45 && integer % 10 == 0)
+            .attackCondition(ICE_ELEMENTAL_PREDICATE)
+            .typeDamage(DamageTypes.FREEZE, 5.0F).build();
 
     public IceQueen(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -102,24 +139,29 @@ public class IceQueen extends IceElementalMob implements RangedAttackMob {
                                     }
                                 })
                                         .cooldownFor(livingEntity -> 300),
-                                new HeldAnimatedHitboxAttack<>(SHARDS)
+                                new HeldAnimatedHitboxAttack<>(SHARDS, SHARD)
                                         .attackRange(3)
                                         .attackSound(27, SoundEvents.TRIDENT_RETURN, SoundEvents.TRIDENT_RETURN, SoundEvents.TRIDENT_RETURN, SoundEvents.TRIDENT_RETURN, SoundEvents.TRIDENT_RETURN, SoundEvents.TRIDENT_RETURN)
                                         .attackInterval(mob -> 80)
                                         .onTick(mob -> {
-                                            lockMovement(mob);
+                                            lockMovement();
                                             return true;
                                         })
                                         .runFor(mob -> 70),
+                                new AnimatedHitboxAttack<IceQueen>(50, ROSE)
+                                        .attackRange(5, 13)
+                                        .whenActivating(iceQueen -> {
+                                            RoseProjectile spriteProjectile = new RoseProjectile(this.level(), this);
+                                            double d0 = iceQueen.getTarget().getX() - this.getX();
+                                            double d1 = iceQueen.getTarget().getY() - this.getY();
+                                            double d2 = iceQueen.getTarget().getZ() - this.getZ();
+                                            spriteProjectile.shoot(d0, d1, d2, 1.0F, 1.0F);
+                                            this.level().addFreshEntity(spriteProjectile);
+                                        })
+                                        .cooldownFor(iceQueen -> 180),
                                 new AnimatableRangedAttack<>(12)
-                                        .whenActivating(livingEntity -> {
-                                            triggerAnim("RangedBasic", "basic");
-                                            this.level().playSound((Player) null, this.getX(), this.getY(), this.getZ(), SoundEvents.TRIDENT_RETURN, this.getSoundSource(), 1.0F, 2.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
-                                        })
-                                        .startCondition(livingEntity -> {
-                                            float dist = this.getTarget().distanceTo(livingEntity);
-                                            return dist > 3 && dist < 12;
-                                        })
+                                        .attackRadius(12)
+                                        .whenStarting(livingEntity -> triggerAnim("RangedBasic", "basic"))
                         )
                 )
         );
@@ -127,7 +169,13 @@ public class IceQueen extends IceElementalMob implements RangedAttackMob {
 
     @Override
     public void performRangedAttack(LivingEntity pTarget, float pVelocity) {
-
+        IceQueenProjectile spriteProjectile = new IceQueenProjectile(this.level(), this);
+        double d0 = pTarget.getX() - this.getX();
+        double d1 = pTarget.getY() - this.getY();
+        double d2 = pTarget.getZ() - this.getZ();
+        spriteProjectile.shoot(d0, d1, d2, 1.0F, 1.0F);
+        this.level().addFreshEntity(spriteProjectile);
+        this.level().playSound((Player)null, this.getX(), this.getY(), this.getZ(), SoundEvents.TRIDENT_RETURN, this.getSoundSource(), 1.0F, 2.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
     }
 
     @Override
@@ -145,6 +193,8 @@ public class IceQueen extends IceElementalMob implements RangedAttackMob {
                 .triggerableAnim(MIST.animName(), RawAnimation.begin().thenPlay(MIST.animName())));
         controllers.add(new AnimationController<IceElementalMob>(this, WALLS.controllerName(), 0, state -> PlayState.STOP)
                 .triggerableAnim(WALLS.animName(), RawAnimation.begin().thenPlay(WALLS.animName())));
+        controllers.add(new AnimationController<IceElementalMob>(this, ROSE.controllerName(), 0, state -> PlayState.STOP)
+                .triggerableAnim(ROSE.animName(), RawAnimation.begin().thenPlay(ROSE.animName())));
     }
 
     public <T extends IceElementalMob> AnimationController<T> walkAndIdleController(T animatable) {
@@ -196,18 +246,35 @@ public class IceQueen extends IceElementalMob implements RangedAttackMob {
                 .add(Attributes.MOVEMENT_SPEED, 0.2);
     }
 
+    @Override
+    public List<SentinelBox> getSentinelBoxes() {
+        return ObjectArrayList.of(
+                SHARD,
+                BEAM_1,
+                BEAM_2,
+                BEAM_3,
+                BEAM_4
+        );
+    }
+
     public static class BeamAttack extends HeldAnimatedHitboxAttack<IceQueen> {
         private static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = ObjectArrayList.of(Pair.of(SBLMemoryTypes.SPECIAL_ATTACK_COOLDOWN.get(), MemoryStatus.VALUE_ABSENT), Pair.of(MemoryModuleType.ATTACK_COOLING_DOWN, MemoryStatus.VALUE_ABSENT));
 
         public BeamAttack() {
-            super(BEAM);
+            super(BEAM, BEAM_1);
             attackRange(6, 25);
             attackSound(12, SoundEvents.ILLUSIONER_CAST_SPELL);
             attackInterval(iceQueen -> 150);
             runFor(iceQueen -> 100);
+            whenStarting(iceQueen -> {
+                iceQueen.triggerSentinelBox(BEAM_2);
+                iceQueen.triggerSentinelBox(BEAM_3);
+                iceQueen.triggerSentinelBox(BEAM_4);
+            });
             whenStopping(iceQueen -> {
                 BrainUtils.setForgettableMemory(iceQueen, SBLMemoryTypes.SPECIAL_ATTACK_COOLDOWN.get(), true, 400);
             });
+            cooldownFor(iceQueen -> 400);
         }
 
         @Override
@@ -222,7 +289,7 @@ public class IceQueen extends IceElementalMob implements RangedAttackMob {
                 LivingEntity target = iceQueen.getTarget();
                 if (target != null) BehaviorUtils.lookAtEntity(iceQueen, iceQueen.getTarget());
             } else {
-                lockMovement(iceQueen);
+                iceQueen.lockMovement();
                 iceQueen.playBeamSound();
             }
         }
@@ -249,7 +316,7 @@ public class IceQueen extends IceElementalMob implements RangedAttackMob {
         @Override
         protected void tick(IceQueen entity) {
             super.tick(entity);
-            lockMovement(entity);
+            entity.lockMovement();
             if (this.getRunningTime() == 65) {
                 Vec3 spawnPos = Vec3.atBottomCenterOf(RandomUtil.getRandomPositionWithinRange(entity.blockPosition(), 3, 2, 3, true, entity.level()));
                 IceGolem iceGolem = MobInit.ICE_GOLEM.get().create(entity.level());

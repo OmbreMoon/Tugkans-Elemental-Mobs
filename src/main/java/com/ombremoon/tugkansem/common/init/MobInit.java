@@ -19,7 +19,7 @@ public class MobInit {
     public static final List<AttributesRegister<?>> attributeSuppliers = new ArrayList<>();
 
     public static final RegistryObject<EntityType<IceBruiser>> ICE_BRUISER = registerMob("ice_bruiser", IceBruiser::new, false, 0x6fdaef, 0x39347b, IceBruiser::createBruiserAttributes);
-    public static final RegistryObject<EntityType<IceGolem>> ICE_GOLEM = registerMob("ice_golem", IceGolem::new, false, 0x276ecf, 0x332a61, IceGolem::createGolemAttributes);
+    public static final RegistryObject<EntityType<IceGolem>> ICE_GOLEM = registerMob("ice_golem", IceGolem::new, MobCategory.MONSTER, false, 0.9F, 2.9F, 0x276ecf, 0x332a61, 24, IceGolem::createGolemAttributes);
     public static final RegistryObject<EntityType<IceSprite>> ICE_SPRITE = registerMob("ice_sprite", IceSprite::new, false, 0xd5fff9, 0xffffff, IceSprite::createSpriteAttributes);
     public static final RegistryObject<EntityType<IceQueen>> ICE_QUEEN = registerMob("ice_queen", IceQueen::new, MobCategory.MONSTER, false, 0.6F, 2.8F, 0x87f5f2, 0xffffff, 24, IceQueen::createQueenAttributes);
     public static final RegistryObject<EntityType<PossessedAztecArmor>> AZTEC_ARMOR = registerMob("possessed_aztec_armor", PossessedAztecArmor::new, MobCategory.MONSTER, false, 0.6F, 2.8F, 0x87f5f2, 0xffffff, 24, PossessedAztecArmor::createSpriteAttributes);

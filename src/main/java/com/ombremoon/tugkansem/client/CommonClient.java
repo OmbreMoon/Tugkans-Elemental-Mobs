@@ -23,6 +23,8 @@ public class CommonClient {
                 new Renderers(MobInit.ICE_QUEEN, IceElementalRenderer::new),
                 new Renderers(MobInit.AZTEC_ARMOR, PossessedArmorRenderer::new),
 
+                new Renderers(ProjectileInit.ROSE, IceRoseRenderer::new),
+                new Renderers(ProjectileInit.ICE_QUEEN_BULLET, IceQueenBulletRenderer::new),
                 new Renderers(ProjectileInit.ICE_SPRITE_BULLET, IceSpriteBulletRenderer::new),
                 new Renderers(EntityInit.ICE_SPIKE, IceSpikeRenderer::new),
                 new Renderers(EntityInit.ICE_MIST, IceMistRenderer::new),
@@ -31,17 +33,6 @@ public class CommonClient {
         );
     }
 
-    public static List<LayerDefinitions> getLayerDefinitions() {
-        List<LayerDefinitions> definitions = new ArrayList<>();
-        definitions.addAll(List.of(
-
-        ));
-        return definitions;
-    }
-
     public record Renderers<T extends Entity>(Supplier<EntityType<T>> type, EntityRendererProvider<T> renderer) {
-    }
-
-    public record LayerDefinitions(ModelLayerLocation layerLocation, LayerDefinition supplier) {
     }
 }

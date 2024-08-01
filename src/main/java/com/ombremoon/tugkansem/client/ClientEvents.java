@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,31 +29,13 @@ public class ClientEvents {
         }
 
         @SubscribeEvent
-        public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            CommonClient.getLayerDefinitions().forEach(
-                    layerDefinitions -> event.registerLayerDefinition(layerDefinitions.layerLocation(), layerDefinitions::supplier)
-            );
-        }
-
-        @SubscribeEvent
-        public static void registerEntityLayers(EntityRenderersEvent.AddLayers event) {
-            for (final String skin : event.getSkins()) {
-                final LivingEntityRenderer<Player, PlayerModel<Player>> playerRenderer = event.getSkin(skin);
-                if (playerRenderer == null)
-                    continue;
-//                playerRenderer.addLayer(new MidasShoulderGuardLayer<>(playerRenderer));
-            }
-        }
-
-        @SubscribeEvent
         public static void registerParticleProvider(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ParticleInit.ICE_SPRITE_BULLET_TRAIL.get(), IceSpriteBulletParticle.Provider::new);
         }
 
     }
 
-    @Mod.EventBusSubscriber(modid = Constants.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents {
-
     }
 }

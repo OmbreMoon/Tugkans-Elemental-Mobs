@@ -35,6 +35,9 @@ public class ModLangProvider extends LanguageProvider {
         BlockInit.BLOCKS.getEntries().forEach(this::blockLang);
         EntityInit.ENTITIES.getEntries().forEach(this::entityLang);
         tabLang();
+        add("death.attack.golem_smash", "%s got crushed to death by an Ice Golem");
+        add("death.attack.golem_shield_break", "%s got pummelled by an Ice Golem");
+        add("death.attack.ice_elemental", "%s was frozen by an %s");
     }
 
     protected void itemLang(RegistryObject<Item> entry) {
